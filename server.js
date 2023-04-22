@@ -1,28 +1,22 @@
-const express = require('express');
+//const express = require('express');
 const mysql = require('mysql2');
 const consoleTable = require('console.table');
 const inquirer = require('inquirer');
 
-const PORT = process.env.PORT || 3001;
-const app = express();
-
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
-
 const db = mysql.createConnection(
 	{
-	  host: 'localhost',
-	  // MySQL username,
-	  user: 'root',
-	  // MySQL password
-	  password: 'process.env.DB_PASSWORD',
-	  database: 'employee_db',
-	  socketPath: '/tmp/mysql.sock'
+	  host: "localhost",
+	  user: "root",
+	  password: "process.env.DB_PW",
+	  database: "employee_db",
+	  socketPath: "/tmp/mysql.sock"
 	},
 	console.log(`Connected to the employee_db database.`)
   );
 
-  function init() {
+  db.connect();
+
+  function Questions() {
 	inquirer.prompt([
 		{
 			type:"list",
@@ -30,11 +24,11 @@ const db = mysql.createConnection(
 			name:"choice",
 			choices: [
 				"View All Employees",
-				"Add Employee",
-				"Update Employee Role",
-				"View Employee Role",
-				"Add Role",
+				"View All Roles",
 				"View All Departments",
+				"Update Employee Role",
+				"Add Employee",
+				"Add Role",
 				"Add Department"
 			]
 		}
@@ -45,20 +39,20 @@ const db = mysql.createConnection(
 			case "View All Employees":
 				viewAllEmployees();
 				break;
-			case "Add Employee":
-				addEmployee();
+			case "View All Roles":
+				viewAllRoles();
+				break;
+			case "View All Departments":
+				viewAllDepartments();
 				break;
 			case "Update Employee Role":
 				updateEmployeeRole();
 				break;
-			case "View Employee Role":
-				viewEmployeeRole();
+			case "Add Employee":
+				addEmployee();
 				break;
-			case "addRole":
+			case "Add Role":
 				addRole();
-				break;
-			case "View All Departments":
-				viewAllDepartments();
 				break;
 			case "Add Department":
 				addDepartment();
@@ -70,4 +64,37 @@ const db = mysql.createConnection(
 	})
   }
 
-  init();
+  viewAllEmployees = () => {
+	db.query('SELECT * FROM department', function (err, result) {
+		console.table(result);
+		Questions();
+	})
+  }
+  viewAllRoles = () => {
+	db.query('SELECT role.id, role.title, role.salary, department.name FROM role LEFT JOIN department ON role.department_id = department.id', function (err, result) {
+		console.table(result);
+		Questions();
+	})
+  }
+  viewAllDepartments  = () => {
+	db.query('SELECT * FROM department', function (err, result) {
+		console.table(result);
+		Questions();
+	})
+  }
+  updateEmployeeRole = () => {
+	
+  }
+  addEmployee = () => {
+	
+  }
+  addRole = () => {
+	
+  }
+  addDepartment = () => {
+	
+  }
+
+
+
+  Questions();
